@@ -37,14 +37,17 @@ Protect/@{show, $nbAddr, $nbAddrF, info}
 
 (***********************************************************************)
 
-webListenerF = Module[{request,result,response},
+webListenerF = Module[{request,result0,result,format,response},
     
   request = #@"Data"~
             ImportString~"HTTPRequest";
+	    
+  result0 = request@"Body"~
+	    ToExpression~StandardForm;
+	    
+  format = If[ContainsAny[{Head @ result0}, {Graph,Graphics}], "SVG", "String"];
 
-  result  = request@"Body"~
-	    ToExpression~StandardForm~
-	    ExportString~"SVG";
+  result  = ExportString[result0, format];
 
   response = result~HTTPResponse~
 	     <|"StatusCode"  -> 200,
@@ -66,7 +69,7 @@ manipulate = $nbAddr <> Export["JWLSout/manipulate.html", #, "Text"]& @
 		  "x3" -> If[Length@#2 == 4, #2[[4]], 1]
 		|> ] &  
        
-SetAttributes[manipulate, {HoldFirst, Protected}]
+SetAttributes[manipulate, {HoldAll, Protected}]
 
 
 (***********************************************************************)
@@ -80,7 +83,7 @@ parseCellF = Module[
   
   ToExpression[#, InputForm, Hold] ~DeleteCases~ Null // 
   List @@ HoldForm /@ # & //
-  Check[ outFormF @ ReleaseHold @ #, Last @ $MessageList]& /@ # & //
+  Check[ outFormF @ ReleaseHold @ #,  Last @ $MessageList]& /@ # & //
   Column@Riffle[#, " "]& 
 ]&
 
