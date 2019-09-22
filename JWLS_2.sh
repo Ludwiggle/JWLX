@@ -77,14 +77,14 @@ SetAttributes[manipulate, {HoldAll, Protected}]
 parseCellF = Module[
 
   {heads = {Grid, Column, TableForm, MatrixForm, Multicolumn, Row, 
-            Graph, Graphics, InformationData}},
+            Graph, Graphics, InformationData, Symbol}},
   
   outFormF = If[heads ~MemberQ~ Head@#, #, ScriptForm@#] &;
   
   ToExpression[#, InputForm, Hold] ~DeleteCases~ Null // 
   List @@ HoldForm /@ # & //
   Check[ outFormF @ ReleaseHold @ #,  Last @ $MessageList]& /@ # & //
-  Column@Riffle[#, " "]& 
+  Column@Riffle[#~DeleteCases~ Null, " "]& 
 ]&
 
 SetAttributes[parseCellF, Protected]
