@@ -72,6 +72,22 @@ manipulate = $nbAddr <> Export["JWLSout/manipulate.html", #, "Text"]& @
 SetAttributes[manipulate, {HoldAll, Protected}]
 
 
+listanimate@list_ := Module[
+  
+  {flns = ("JWLSout/"<>
+           StringPadLeft[ToString@#, Ceiling@Log[10, Length@list],"0"]<>
+           ".png")& /@ Range@Length@list,
+   
+   tpl = Get@"/home/nicola/Gits/JWLS_2/JWLS_2_kernel/ciccia.wl"},
+
+  Export[#1,#2,"PNG"]& ~MapThread~ {flns,list};
+  Export["JWLSout/listanimate.html",
+         TemplateApply[tpl, <|"ims" -> (FileNameTake/@flns // 
+                                        "\""<>#<>"\""& /@ #& //
+                                        StringRiffle[#,","]&) 
+                            |>],
+         "Text"] // $nbAddr<># & ]
+
 (***********************************************************************)
 
 parseCellF = Module[
