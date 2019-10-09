@@ -3,8 +3,14 @@
 
 mkdir JWLSout 2>/dev/null
 
+mkdir /tmp/jwlsin
+wait
+sudo mount -t tmpfs -o size=1M tmpfs /tmp/jwlsin
+wait
+
 function finish {
   rm -r JWLSout
+  rm -r /tmp/jwlsin
 }
 
 wolframscript -c '

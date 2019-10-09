@@ -23,7 +23,9 @@ class JWLS_2_kernel(Kernel):
     def do_execute(self, code, silent, store_history=False, user_expressions=None,
                    allow_stdin=False):
         
-        wl_response = os.popen('echo '+"'"+code+"'"+' | nc 127.0.0.1 5858').read()
+        open('/mnt/jwlsin/code', 'w').write(code).close()
+        
+        wl_response = os.popen('cat /mnt/jwlsin/code | nc 127.0.0.1 5858').read()
 
         stream_content = {'name': 'stdout', 'text': wl_response}
         self.send_response(self.iopub_socket, 'stream', stream_content)
