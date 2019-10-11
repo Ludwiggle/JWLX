@@ -3,14 +3,9 @@
 
 mkdir JWLSout 2>/dev/null
 
-mkdir /tmp/jwlsin
-wait
-sudo mount -t tmpfs -o size=1M tmpfs /tmp/jwlsin
-wait
 
 function finish {
   rm -r JWLSout
-  rm -r /tmp/jwlsin
 }
 
 wolframscript -c '
@@ -96,18 +91,14 @@ listanimate@list_ := Module[
 
 (***********************************************************************)
 
-parseCellF = Module[
-
-  {heads = {Grid, Column, TableForm, MatrixForm, Multicolumn, Row, 
-            Graph, Graphics, InformationData, Symbol}},
-  
-  outFormF = If[heads ~MemberQ~ Head@#, #, ScriptForm@#] &;
-  
+parseCellF = (
   ToExpression[#, InputForm, Hold] ~DeleteCases~ Null // 
   List @@ HoldForm /@ # & //
-  Check[ outFormF @ ReleaseHold @ #,  Last @ $MessageList]& /@ # & //
-  Column@Riffle[#~DeleteCases~ Null, " "]& 
-]&
+  Check[ ReleaseHold @ #,  Last @ $MessageList]& /@ # & //
+  # ~DeleteCases~ Null /. x_?NumericQ -> ScriptForm@x & //
+  Column @ Riffle[#, " "]& 
+)&
+
 
 SetAttributes[parseCellF, Protected]
 

@@ -4,6 +4,7 @@ import os
 
 WNames = open('/home/nicola/Gits/JWLS_2/JWLS_2_kernel/Names.wl.txt',
               'r').read().split()
+              
 
 ######################################################################################
 class JWLS_2_kernel(Kernel):
@@ -23,9 +24,11 @@ class JWLS_2_kernel(Kernel):
     def do_execute(self, code, silent, store_history=False, user_expressions=None,
                    allow_stdin=False):
         
-        open('/mnt/jwlsin/code', 'w').write(code).close()
+        jwlsin = open('/dev/shm/jwlsin', 'w')
+        jwlsin.write(code)
+        jwlsin.close()
         
-        wl_response = os.popen('cat /mnt/jwlsin/code | nc 127.0.0.1 5858').read()
+        wl_response = os.popen('cat /dev/shm/jwlsin | nc 127.0.0.1 5858').read()
 
         stream_content = {'name': 'stdout', 'text': wl_response}
         self.send_response(self.iopub_socket, 'stream', stream_content)
