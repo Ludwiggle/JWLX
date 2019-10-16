@@ -2,8 +2,9 @@ StringTemplate@"
 <html>
 <body>
   
-<input type=\"range\" id=\"x\" min=\"`x1`\" max=\"`x2`\" step=\"`x3`\" class=\"slider\" oninput=\"refresh();\">
-<div id=\"result\"></div>
+<input type=\"range\" id=\"x\" min=\"`x1`\" max=\"`x2`\" step=\"`x3`\" value=\"`x1`\" class=\"slider\" oninput=\"refresh();\">
+<div id= \"result\"></div>
+
 
 <script>
 	refresh = function(`v`) {

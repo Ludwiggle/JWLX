@@ -2,8 +2,15 @@ from ipykernel.kernelbase import Kernel
 import os
 
 
-WNames = open('/home/nicola/Gits/JWLS_2/JWLS_2_kernel/Names.wl.txt',
-              'r').read().split()
+######################################################################################
+def wl_response(wl_cell):
+        jwlsin = open('/dev/shm/jwlsin', 'w')
+        jwlsin.write(wl_cell)
+        jwlsin.close()
+        return os.popen('cat /dev/shm/jwlsin | nc 127.0.0.1 5858').read()
+
+
+WNames = wl_response('StringRiffle@Names@"*"').split()
               
 
 ######################################################################################
@@ -23,14 +30,8 @@ class JWLS_2_kernel(Kernel):
     ##################################################################################
     def do_execute(self, code, silent, store_history=False, user_expressions=None,
                    allow_stdin=False):
-        
-        jwlsin = open('/dev/shm/jwlsin', 'w')
-        jwlsin.write(code)
-        jwlsin.close()
-        
-        wl_response = os.popen('cat /dev/shm/jwlsin | nc 127.0.0.1 5858').read()
 
-        stream_content = {'name': 'stdout', 'text': wl_response}
+        stream_content = {'name': 'stdout', 'text': wl_response(code)}
         self.send_response(self.iopub_socket, 'stream', stream_content)
 
         return {'status': 'ok',
@@ -61,8 +62,10 @@ class JWLS_2_kernel(Kernel):
                     ).replace('!', ' ').split()[-1]
                             
         start = cursor_pos - len(token)
+        
+        allWNames = wl_response('StringRiffle@Names@"Global`*"').split() + WNames
 
-        matches = [m for m in WNames if m.startswith(token)]
+        matches = [m for m in allWNames if m.startswith(token)]
 
         return {'matches': sorted(matches), 'cursor_start': start,
                 'cursor_end': cursor_pos,

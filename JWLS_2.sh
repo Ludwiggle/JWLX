@@ -2,10 +2,12 @@
 
 
 mkdir JWLSout 2>/dev/null
+mkdir /dev/shm/JWLSout 2>/dev/null
 
 
 function finish {
   rm -r JWLSout
+  rm -r /dev/shm/JWLSout
 }
 
 wolframscript -c '
@@ -23,7 +25,12 @@ $nbAddr = nbAddrF
 
 (***********************************************************************)
 
-show@g_Image := $nbAddr<>Export["JWLSout/out.png",g,"PNG"]
+show@g_Image := "JWLSout/out.png" // (
+		"ln -s "<>Export["/dev/shm/"<>#, g, "PNG"]<>" "<># // Run;
+		$nbAddr<># ) & 
+                 
+show@g_Image := $nbAddr<>Export["JWLSout/out.png",g,"PNG"]     
+
 				
 show@g_ := $nbAddr<>Export["JWLSout/out.pdf",g,"PDF"]     
 
@@ -62,12 +69,12 @@ webListenerF = Module[{request,result0,result,format,response},
 
 
 manipulate = $nbAddr <> Export["JWLSout/manipulate.html", #, "Text"]& @
-	     TemplateApply[ Get@"/home/nicola/Gits/JWLS_2b/JWLS_2_kernel/splate.wl", 
+	     TemplateApply[ Get@"/home/nicola/Gits/JWLS_2/JWLS_2_kernel/splate.wl", 
 		<|"f" -> (#1 /. #2[[1]] -> ("\"+" <> ToString[#2[[1]]] <> "+\"")),
 		  "v" -> #2[[1]],
 		  "x1" -> #2[[2]],
 		  "x2" -> #2[[3]],
-		  "x3" -> If[Length@#2 == 4, #2[[4]], 1]
+		  "x3" -> If[Length@#2 == 4, #2[[4]], .1 (#2[[3]]-#2[[2]]) ]
 		|> ] &  
        
 SetAttributes[manipulate, {HoldAll, Protected}]
@@ -75,13 +82,15 @@ SetAttributes[manipulate, {HoldAll, Protected}]
 
 listanimate@list_ := Module[
   
-  {flns = ("JWLSout/"<>
+  {flns = ("/dev/shm/JWLSout/"<>
            StringPadLeft[ToString@#, Ceiling@Log[10, Length@list],"0"]<>
            ".png")& /@ Range@Length@list,
    
    tpl = Get@"/home/nicola/Gits/JWLS_2/JWLS_2_kernel/ciccia.wl"},
-
+  
+  Run["rm /dev/shm/JWLSout/*.png; rm JWLSout/*.png"];
   Export[#1,#2,"PNG"]& ~MapThread~ {flns,list};
+  Run["ln -s "<>#<>" JWLSout/"<>FileNameTake@#] & /@ flns;
   Export["JWLSout/listanimate.html",
          TemplateApply[tpl, <|"ims" -> (FileNameTake/@flns // 
                                         "\""<>#<>"\""& /@ #& //

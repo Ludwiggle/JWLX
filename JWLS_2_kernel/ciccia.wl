@@ -3,9 +3,9 @@ StringTemplate@"
 <html>
 <body>
 
-<input type=\"range\" id=\"vrtx\" min=\"1\" max=\"10\" value=\"1\" class=\"slider\" oninput=\"refresh();\">
+<input type=\"range\" id=\"vrtx\" value=\"0\" class=\"slider\" oninput=\"refresh();\">
 
-<div id='result'></div>
+<span id='result'></span>
 
 
 <script>
@@ -28,8 +28,8 @@ StringTemplate@"
   fig.setAttribute(\"id\",\"mysvg\")
   document.body.appendChild(fig)
   let img = document.createElement(\"IMG\")
-  img.setAttribute(\"width\", \"50\") /* set desired item size otherwise full-size*/
-  img.setAttribute(\"heigh\", \"50\")//* set desired item sizeotherwise full-size*/
+  //img.setAttribute(\"width\", \"250\") /* set desired item size otherwise full-size*/
+  //img.setAttribute(\"heigh\", \"250\")//* set desired item sizeotherwise full-size*/
   fig.appendChild(img);
   let range_slider = document.querySelector(\"input[type=range]\")
   range_slider.min = 1;

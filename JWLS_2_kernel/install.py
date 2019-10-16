@@ -8,7 +8,7 @@ from IPython.utils.tempdir import TemporaryDirectory
 
 kernel_json = {
     "argv": [sys.executable, "-m", "JWLS_2_kernel", "-f", "{connection_file}"],
-    "display_name": "JWLS",
+    "display_name": "JWLS_2",
     "language": "text",
 }
 
