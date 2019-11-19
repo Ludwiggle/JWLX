@@ -19,7 +19,7 @@ StringTemplate@"
 		}
 
 		request.open(\"POST\", url, true);
-		request.send(data);
+		request.send(data+'//ReleaseHold');
 	}
 </script>
 

@@ -1,11 +1,51 @@
 StringTemplate@"
 
 <html>
+<style>
+.slidecontainer {
+  width: 40%;
+}
+
+.slider {
+  -webkit-appearance: none;
+  width: 40%;
+  height: 15px;
+  border-radius: 5px;
+  background: #d3d3d3;
+  outline: none;
+  opacity: 0.7;
+  -webkit-transition: .2s;
+  transition: opacity .2s;
+}
+
+.slider:hover {
+  opacity: 1;
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  background: #4CAF50;
+  cursor: pointer;
+}
+
+.slider::-moz-range-thumb {
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  background: #4CAF50;
+  cursor: pointer;
+}
+</style>
+
 <body>
 
-<input type=\"range\" id=\"vrtx\" value=\"0\" class=\"slider\" oninput=\"refresh();\">
+<input type=\"range\"  class=\"slider\"  oninput=\"refresh();\">
 
-<span id='result'></span>
+<span  <p> <span id='result'> </span> of `total` </p> </span>
 
 
 <script>
@@ -16,52 +56,59 @@ StringTemplate@"
     `ims`
   ]
 
-  let i = 0
+
   let src = \"\"
 
   function refresh(){
+   
     document.querySelector(\"img\").setAttribute(\"src\", src)
-    document.querySelector(\"#result\").innerHTML = output
+   
+    document.querySelector(\"#result\").innerHTML = output*1 + 1 
+  
   }
 
-  let fig = document.createElement(\"figure\");// you can change html element here
+
+  let fig = document.createElement(\"figure\");
+  
   fig.setAttribute(\"id\",\"mysvg\")
+  
   document.body.appendChild(fig)
+  
   let img = document.createElement(\"IMG\")
-  //img.setAttribute(\"width\", \"250\") /* set desired item size otherwise full-size*/
-  //img.setAttribute(\"heigh\", \"250\")//* set desired item sizeotherwise full-size*/
+
   fig.appendChild(img);
+  
   let range_slider = document.querySelector(\"input[type=range]\")
-  range_slider.min = 1;
-  range_slider.max = range_slider.value = images.length -1
-  range_slider.step =range_slider.getAttribute(\"step\") ;
+  
+  range_slider.min = range_slider.value =  0
+  
+  range_slider.max  =  images.length - 1
+  
+  range_slider.step = 1
+  
   let input = document.querySelector(\"#result\")
-  let output = i + 1
+  
+  let output = 0
+  
   input.innerHTML = output
 
 
+
   document.addEventListener( 'DOMContentLoaded', (event) => {
+    
+    
+    document.querySelector(\"input[type=range]\").addEventListener('input', (event) => {
+    
+    let value = range_slider.value
+    
+    output= value
+    
+    src=images[value]
+    
     refresh()
-    randomElement = false;//set to false to stop random
-      if (randomElement == true) {
-        document.querySelector(\"input[type=range]\").addEventListener('input', (event) => {
-        let val= range_slider.value
-          output = val
-         let randomElement = images [Math.floor(Math.random() * images.length) ]
-          for( i = 0; i < randomElement.length; i++){
-            i
-            refresh()
-            src = randomElement
-          }
+    
         })
-      }else{
-        document.querySelector(\"input[type=range]\").addEventListener('input', (event) => {
-          let value = range_slider.value
-          console.log(value)
-          output= value
-          src=images[value]
-        })
-      }
+      
 });
 
 </script>

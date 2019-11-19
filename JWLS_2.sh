@@ -10,9 +10,15 @@ function finish {
   rm -r /dev/shm/JWLSout
 }
 
+
 wolframscript -c '
 
-$Output = {}
+
+$kernelPath = "/home/nicola/Gits/JWLS_2/JWLS_2_kernel/"
+
+
+(* $Output = {}" *)
+
 
 nbAddrF := ReadString@"!jupyter notebook list"~
 	   StringCases~Shortest["http://"~~__~~"/"] //
@@ -23,11 +29,10 @@ nbAddrF := ReadString@"!jupyter notebook list"~
 
 $nbAddr = nbAddrF
 
+
+
 (***********************************************************************)
 
-show@g_Image := "JWLSout/out.png" // (
-		"ln -s "<>Export["/dev/shm/"<>#, g, "PNG"]<>" "<># // Run;
-		$nbAddr<># ) & 
                  
 show@g_Image := $nbAddr<>Export["JWLSout/out.png",g,"PNG"]     
 
@@ -43,7 +48,9 @@ info@sym_Symbol := Column @ {
 Protect/@{show, $nbAddr, $nbAddrF, info}
 
 
+
 (***********************************************************************)
+
 
 webListenerF = Module[{request,result0,result,format,response},
     
@@ -53,6 +60,8 @@ webListenerF = Module[{request,result0,result,format,response},
   result0 = request@"Body"~
 	    ToExpression~StandardForm;
 	    
+  # // Echo;
+  	    
   format = If[ContainsAny[{Head @ result0}, {Graph,Graphics}], "SVG", "String"];
 
   result  = ExportString[result0, format];
@@ -62,13 +71,14 @@ webListenerF = Module[{request,result0,result,format,response},
 	       "ContentType" -> "image/svg+xml",
 	       "Headers"     -> {"Access-Control-Allow-Origin" 
 			          -> <|request@"Headers"|> @ "origin"}
-	     |>~ExportString~"HTTPResponse";
+	     |> ~ExportString~ "HTTPResponse";
 
   (#~WriteString~response; Close@#)& @ #@"SourceSocket"
 ]&
 
 
-manipulate = $nbAddr <> Export["JWLSout/manipulate.html", #, "Text"]& @
+
+manipulate1 = $nbAddr <> Export["JWLSout/manipulate.html", #, "Text"]& @
 	     TemplateApply[ Get@"/home/nicola/Gits/JWLS_2/JWLS_2_kernel/splate.wl", 
 		<|"f" -> (#1 /. #2[[1]] -> ("\"+" <> ToString[#2[[1]]] <> "+\"")),
 		  "v" -> #2[[1]],
@@ -77,33 +87,71 @@ manipulate = $nbAddr <> Export["JWLSout/manipulate.html", #, "Text"]& @
 		  "x3" -> If[Length@#2 == 4, #2[[4]], .1 (#2[[3]]-#2[[2]]) ]
 		|> ] &  
        
-SetAttributes[manipulate, {HoldAll, Protected}]
+
+SetAttributes[manipulate1, {HoldAll, Protected}]
+
+
+manipulate2[f_, {v_, x1_, x2_, x3_:0.1}] := 
+              $nbAddr <> Export["JWLSout/manipulate.html", #, "Text"]& @
+
+	      TemplateApply[ Get@"/home/nicola/Gits/JWLS_2/JWLS_2_kernel/splate.wl", 
+	     
+		<|"f" -> (f /. v -> ("\"+" <> ToString@v <> "+\"")),
+		
+		  "v" -> v,
+		  
+		  "x1" -> x1,
+		  
+		  "x2" -> x2,
+		  
+		  "x3" ->  x3
+			    
+		|> ]   
 
 
 listanimate@list_ := Module[
   
-  {flns = ("/dev/shm/JWLSout/"<>
-           StringPadLeft[ToString@#, Ceiling@Log[10, Length@list],"0"]<>
-           ".png")& /@ Range@Length@list,
+   {flns = ("/dev/shm/JWLSout/"<>
+             StringPadLeft[ ToString@#, IntegerLength@Length@list, "0" ]<>
+            ".png")& /@ Range @ Length @ list,
    
-   tpl = Get@"/home/nicola/Gits/JWLS_2/JWLS_2_kernel/ciccia.wl"},
+    tpl = $kernelPath <> "ciccia.wl" // Get 
+   },
+   
+   
+  "rm /dev/shm/JWLSout/*.png" // Run ;
   
-  Run["rm /dev/shm/JWLSout/*.png; rm JWLSout/*.png"];
   Export[#1,#2,"PNG"]& ~MapThread~ {flns,list};
-  Run["ln -s "<>#<>" JWLSout/"<>FileNameTake@#] & /@ flns;
-  Export["JWLSout/listanimate.html",
-         TemplateApply[tpl, <|"ims" -> (FileNameTake/@flns // 
-                                        "\""<>#<>"\""& /@ #& //
-                                        StringRiffle[#,","]&) 
-                            |>],
-         "Text"] // $nbAddr<># & ]
+  
+  Export["/dev/shm/JWLSout/listanimate.html"
+	 , tpl ~TemplateApply~ <|"ims" -> (FileNameTake/@flns // 
+					   "\""<>#<>"\""& /@ #& //
+					   StringRiffle[#,","]& ) ,
+			        "total" -> Length@list |>
+	 , "Text" 
+        
+	] // "file://" <> # & // (UsingFrontEnd@SystemOpen@#; Echo@#)&
+
+]
+
+
+
+refresh[f_,dt_:1000] := $nbAddr <> Export["JWLSout/refresh.html", #, "Text"]& @ 
+	   TemplateApply[ Get@"/home/nicola/Gits/JWLS_2/JWLS_2_kernel/refresh.wl", 
+		         <|"f" -> ExportString[f,"Text"],
+			   "dt" -> dt
+			 |> ] 
+
+(* SetAttributes[refresh, {HoldAll, Protected}] *)
+
 
 (***********************************************************************)
+
 
 parseCellF = (
   ToExpression[#, InputForm, Hold] ~DeleteCases~ Null // 
   List @@ HoldForm /@ # & //
-  Check[ ReleaseHold @ #,  Last @ $MessageList]& /@ # & //
+  Check[ ReleaseHold @ #,  Last @ $MessageList ]& /@ # & //
   # ~DeleteCases~ Null /. x_?NumericQ -> ScriptForm@x & //
   Column @ Riffle[#, " "]& 
 )&
@@ -123,8 +171,9 @@ Off[General::stop]
                
 (***********************************************************************)
 
-SocketListen[5859, webListenerF]
+
 SocketListen[5858, listenerF]
+SocketListen[5859, webListenerF, HandlerFunctionsKeys -> {"DataByteArray","Data","SourceSocket"}]
 
 Dialog[]
 '

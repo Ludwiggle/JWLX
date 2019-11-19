@@ -1,7 +1,6 @@
 from ipykernel.kernelbase import Kernel
 import os
 
-
 ######################################################################################
 def wl_response(wl_cell):
         jwlsin = open('/dev/shm/jwlsin', 'w')
@@ -10,7 +9,7 @@ def wl_response(wl_cell):
         return os.popen('cat /dev/shm/jwlsin | nc 127.0.0.1 5858').read()
 
 
-WNames = wl_response('StringRiffle@Names@"*"').split()
+WNames = wl_response('StringRiffle@Names@"System`*"').split()
               
 
 ######################################################################################
@@ -30,6 +29,7 @@ class JWLS_2_kernel(Kernel):
     ##################################################################################
     def do_execute(self, code, silent, store_history=False, user_expressions=None,
                    allow_stdin=False):
+                       
 
         stream_content = {'name': 'stdout', 'text': wl_response(code)}
         self.send_response(self.iopub_socket, 'stream', stream_content)
@@ -56,10 +56,10 @@ class JWLS_2_kernel(Kernel):
                     ).replace('>', ' ').replace('<', ' ').replace(':', ' '
                     ).replace('[', ' ').replace(']', ' ').replace('(', ' '
                     ).replace(')', ' ').replace('{', ' ').replace('}', ' '
-                    ).replace('_', ' ').replace('+', ' ').replace('*', ' '
-                    ).replace('#', ' ').replace('=', ' ').replace('"', ' '
-                    ).replace('~', ' ').replace('&', ' ').replace('|', ' '
-                    ).replace('!', ' ').split()[-1]
+                    ).replace('_', ' ').replace('-', ' ').replace('+', ' '
+                    ).replace('*', ' ').replace('#', ' ').replace('=', ' '
+                    ).replace('"', ' ').replace('~', ' ').replace('&', ' '
+                    ).replace('|', ' ').replace('!', ' ').split()[-1]
                             
         start = cursor_pos - len(token)
         
