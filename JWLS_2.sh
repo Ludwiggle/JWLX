@@ -138,7 +138,8 @@ listanimate@list_ := Module[
 
 refresh[f_,dt_:1000] := $nbAddr <> Export["JWLSout/refresh.html", #, "Text"]& @ 
 	   TemplateApply[ Get@"/home/nicola/Gits/JWLS_2/JWLS_2_kernel/refresh.wl", 
-		         <|"f" -> ExportString[f,"Text"],
+		         <|(*"f" -> ExportString[f,"Text"],*)
+			   "f" -> BinarySerialize@f ~ExportString~ "Text",
 			   "dt" -> dt
 			 |> ] 
 
