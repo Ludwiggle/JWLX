@@ -13,7 +13,7 @@ StringTemplate@"
             document.getElementById('result').innerHTML = request.responseText;
         }
         request.open('POST', url, true);
-        request.send(data+'//ReleaseHold');
+        request.send(data+'//BinaryDeserialize//ReleaseHold');
     }
     </script>
 

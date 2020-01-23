@@ -18,7 +18,7 @@ $kernelPath = "/home/nicola/Gits/JWLS_2/JWLS_2_kernel/"
 
 $jupyterPath = RunProcess[{"which","jupyter"}, "StandardOutput"] // StringTrim
 
-$kernelPath  = RunProcess[{"pip","show","jupyter"}] // 
+$kernelPath2  = RunProcess[{"pip","show","jupyter"}] // 
                If[#@"ExitCode" == 1
                   , Return@" > pip did not find jupyter"
                   , #@"StandardOutput" ~StringSplit~ "\n" // StringSplit] & // 
