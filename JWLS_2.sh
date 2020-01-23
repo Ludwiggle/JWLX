@@ -18,15 +18,12 @@ $kernelPath = "/home/nicola/Gits/JWLS_2/JWLS_2_kernel/"
 
 $jupyterPath = RunProcess[{"which","jupyter"}, "StandardOutput"] // StringTrim
 
-$kernelPath2  = RunProcess[{"pip","show","jupyter"}] // 
+$kernelPath  = RunProcess[{"pip","show","jupyter"}] // 
                If[#@"ExitCode" == 1
                   , Return@" > pip did not find jupyter"
                   , #@"StandardOutput" ~StringSplit~ "\n" // StringSplit] & // 
                Select[#, First@# == "Location:" &][[1,2]]<>"/JWLS_2_kernel/" &  //
                If[DirectoryQ@#, #, Return@" > JWLS kernel folder not found"]&
-
-
-(* $Output = {}" *)
 
 
 nbAddrF := ReadString["!" <> $jupyterPath <> "-notebook list"] ~
@@ -38,14 +35,15 @@ nbAddrF := ReadString["!" <> $jupyterPath <> "-notebook list"] ~
 
 $nbAddr = nbAddrF
 
+$Output = {}
+
+Off[General::stop] 
 
 
 (***********************************************************************)
-
-                 
 show@g_Image := $nbAddr<>Export["JWLSout/out.png",g,"PNG"]     
 
-				
+
 show@g_ := $nbAddr<>Export["JWLSout/out.pdf",g,"PDF"]     
 
 
@@ -59,105 +57,82 @@ Protect/@{show, $nbAddr, $nbAddrF, info}
 
 
 (***********************************************************************)
-
-
 webListenerF = Module[{request,result0,result,format,response},
     
   request = #@"Data"~
             ImportString~"HTTPRequest";
 	    
   result0 = request@"Body"~
-	    ToExpression~StandardForm;
-	    
-  # // Echo;
+	          ToExpression~StandardForm;
   	    
-  format = If[ContainsAny[{Head @ result0}, {Graph,Graphics}], "SVG", "String"];
+  format = If[ContainsAny[{Head @ result0}, {Graph,Graphics,Image}], "SVG", "String"];
 
   result  = ExportString[result0, format];
 
-  response = result~HTTPResponse~
+  response = result ~HTTPResponse~
 	     <|"StatusCode"  -> 200,
 	       "ContentType" -> "image/svg+xml",
 	       "Headers"     -> {"Access-Control-Allow-Origin" 
-			          -> <|request@"Headers"|> @ "origin"}
+			                     -> <|request@"Headers"|> @ "origin"}
 	     |> ~ExportString~ "HTTPResponse";
 
   (#~WriteString~response; Close@#)& @ #@"SourceSocket"
 ]&
 
 
-
 manipulate1 = $nbAddr <> Export["JWLSout/manipulate.html", #, "Text"]& @
-	     TemplateApply[ $kernelPath <> "splate.wl" // Get, 
-		<|"f" -> (#1 /. #2[[1]] -> ("\"+" <> ToString[#2[[1]]] <> "+\"")),
-		  "v" -> #2[[1]],
-		  "x1" -> #2[[2]],
-		  "x2" -> #2[[3]],
-		  "x3" -> If[Length@#2 == 4, #2[[4]], .1 (#2[[3]]-#2[[2]]) ]
-		|> ] &  
+	            TemplateApply[ $kernelPath <> "splate.wl" // Get
+                            ,  <|"f" -> (#1 /. #2[[1]] -> ("\"+" <> ToString[#2[[1]]] <> "+\"")),
+                                "v" -> #2[[1]],
+                                "x1" -> #2[[2]],
+                                "x2" -> #2[[3]],
+                                "x3" -> If[Length@#2 == 4, #2[[4]], .1 (#2[[3]]-#2[[2]]) ]
+                               |> ] &  
        
 
 SetAttributes[manipulate1, {HoldAll, Protected}]
 
 
 manipulate2[f_, {v_, x1_, x2_, x3_:0.1}] := 
-              $nbAddr <> Export["JWLSout/manipulate.html", #, "Text"]& @
-
-	      TemplateApply[ $kernelPath <> "splate.wl" // Get, 
-	     
-		<|"f" -> (f /. v -> ("\"+" <> ToString@v <> "+\"")),
-		
-		  "v" -> v,
-		  
-		  "x1" -> x1,
-		  
-		  "x2" -> x2,
-		  
-		  "x3" ->  x3
-			    
-		|> ]   
+    $nbAddr <> Export["JWLSout/manipulate.html", #, "Text"]& @
+    TemplateApply[ $kernelPath <> "splate.wl" // Get 
+                  , <|"f" -> (f /. v -> ("\"+" <> ToString@v <> "+\"")),
+                      "v" -> v,
+                      "x1" -> x1,
+                      "x2" -> x2,
+                      "x3" ->  x3|> ]   
 
 
-listanimate@list_ := Module[
-  
-   {flns = ("/dev/shm/JWLSout/"<>
-             StringPadLeft[ ToString@#, IntegerLength@Length@list, "0" ]<>
-            ".png")& /@ Range @ Length @ list,
+listanimate@list_ := Module[  
+    {flns = ("/dev/shm/JWLSout/"<>
+              StringPadLeft[ ToString@#, IntegerLength@Length@list, "0"] <>
+             ".png" )& /@ Range @ Length @ list},
    
-    tpl = $kernelPath <> "ciccia.wl" // Get 
-   },
-   
-   
-  "rm /dev/shm/JWLSout/*.png" // Run ;
-  
-  Export[#1,#2,"PNG"]& ~MapThread~ {flns,list};
-  
+  "rm /dev/shm/JWLSout/*.png" // Run;
+
+  Export[#1,#2,"PNG"]& ~MapThread~ {flns, list};
+
   Export["/dev/shm/JWLSout/listanimate.html"
-	 , tpl ~TemplateApply~ <|"ims" -> (FileNameTake/@flns // 
-					   "\""<>#<>"\""& /@ #& //
-					   StringRiffle[#,","]& ) ,
-			        "total" -> Length@list |>
-	 , "Text" 
-        
-	] // "file://" <> # & // (UsingFrontEnd@SystemOpen@#; Echo@#)&
-
+	       , TemplateApply[$kernelPath <> "ciccia.wl" // Get
+                         , <|"ims" -> ( FileNameTake /@ flns // 
+                                        "\"" <> # <> "\""& /@ #& //
+                                        StringRiffle[#, ","]& ) ,
+                             "total" -> Length@list |>]
+         , "Text"] //
+  "file://" <> #& // (UsingFrontEnd@SystemOpen@#; Echo@#) &
 ]
 
 
 
 refresh[f_,dt_:1] := $nbAddr <> Export["JWLSout/refresh.html", #, "Text"]& @ 
-	   TemplateApply[ $kernelPath <> "refresh.wl" // Get, 
-		         <|(*"f" -> ExportString[f,"Text"],*)
-			   "f" -> BinarySerialize@f ~ExportString~ "Text",
-			   "dt" -> (1000 dt)
-			 |> ] 
+	                   TemplateApply[$kernelPath <> "refresh.wl" // Get
+                                   , <| "f" -> BinarySerialize@f ~ExportString~ "Text",
+                                        "dt" -> (1000 dt) |>] 
 
 (* SetAttributes[refresh, {HoldAll, Protected}] *)
 
 
 (***********************************************************************)
-
-
 parseCellF = (
   ToExpression[#, InputForm, Hold] ~DeleteCases~ Null // 
   List @@ HoldForm /@ # & //
@@ -166,22 +141,16 @@ parseCellF = (
   Column @ Riffle[#, " "]& 
 )&
 
-
 SetAttributes[parseCellF, Protected]
 
-	   
-listenerF = (WriteString[#@"SourceSocket", parseCellF @ #@"Data"]; 
-	     Close @ #@"SourceSocket" 
-	    ) &
+
+listenerF = ( WriteString[#@"SourceSocket", parseCellF @ #@"Data"]; 
+	            Close @ #@"SourceSocket" ) &
 	      
 SetAttributes[listenerF, Protected]
 
-
-Off[General::stop] 
                
 (***********************************************************************)
-
-
 SocketListen[5858, listenerF]
 SocketListen[5859, webListenerF]
 
