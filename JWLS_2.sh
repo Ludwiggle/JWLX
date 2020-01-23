@@ -124,7 +124,7 @@ listanimate@list_ := Module[
 
 
 
-refresh[f_,dt_:1] := $nbAddr <> Export["JWLSout/refresh.html", #, "Text"]& @ 
+refresh[f_,dt_:1] := $nbAddr <> Export["JWLSout/refresh.html", #, "Text"]& @
 	                   TemplateApply[$kernelPath <> "refresh.wl" // Get
                                    , <| "f" -> BinarySerialize@f ~ExportString~ "Text",
                                         "dt" -> (1000 dt) |>] 
@@ -144,8 +144,8 @@ parseCellF = (
 SetAttributes[parseCellF, Protected]
 
 
-listenerF = ( WriteString[#@"SourceSocket", parseCellF @ #@"Data"]; 
-	            Close @ #@"SourceSocket" ) &
+listenerF = ( WriteString[#@"SourceSocket", parseCellF @ #@"Data"];
+             Close @ #@"SourceSocket" ) &
 	      
 SetAttributes[listenerF, Protected]
 
