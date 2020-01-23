@@ -16,16 +16,25 @@ wolframscript -c '
 
 $kernelPath = "/home/nicola/Gits/JWLS_2/JWLS_2_kernel/"
 
+$jupyterPath = RunProcess[{"which","jupyter"}, "StandardOutput"] // StringTrim
+
+$kernelPath2  = RunProcess[{"pip","show","jupyter"}] // 
+               If[#@"ExitCode" == 1
+                  , Return@" > pip did not find jupyter"
+                  , #@"StandardOutput" ~StringSplit~ "\n" // StringSplit] & // 
+               Select[#, First@# == "Location:" &][[1,2]]<>"/JWLS_2_kernel/" &  //
+               If[DirectoryQ@#, #, Return@" > JWLS kernel folder not found"]&
+
 
 (* $Output = {}" *)
 
 
-nbAddrF := ReadString@"!jupyter notebook list"~
-	   StringCases~Shortest["http://"~~__~~"/"] //
+nbAddrF := ReadString["!" <> $jupyterPath <> "-notebook list"] ~
+	   StringCases ~ Shortest["http://"~~__~~"/"] //
 	   If[# == {}
-	      , Run@"jupyter notebook &"; Pause@1; nbAddrF
-	      , First@#<>"files/" 
-	    ]&
+	      , Run[$jupyterPath <>"-notebook &"]; Pause@1; nbAddrF
+	      , First@# <> "files/" 
+	     ]&
 
 $nbAddr = nbAddrF
 
@@ -79,7 +88,7 @@ webListenerF = Module[{request,result0,result,format,response},
 
 
 manipulate1 = $nbAddr <> Export["JWLSout/manipulate.html", #, "Text"]& @
-	     TemplateApply[ Get@"/home/nicola/Gits/JWLS_2/JWLS_2_kernel/splate.wl", 
+	     TemplateApply[ $kernelPath <> "splate.wl" // Get, 
 		<|"f" -> (#1 /. #2[[1]] -> ("\"+" <> ToString[#2[[1]]] <> "+\"")),
 		  "v" -> #2[[1]],
 		  "x1" -> #2[[2]],
@@ -94,7 +103,7 @@ SetAttributes[manipulate1, {HoldAll, Protected}]
 manipulate2[f_, {v_, x1_, x2_, x3_:0.1}] := 
               $nbAddr <> Export["JWLSout/manipulate.html", #, "Text"]& @
 
-	      TemplateApply[ Get@"/home/nicola/Gits/JWLS_2/JWLS_2_kernel/splate.wl", 
+	      TemplateApply[ $kernelPath <> "splate.wl" // Get, 
 	     
 		<|"f" -> (f /. v -> ("\"+" <> ToString@v <> "+\"")),
 		
@@ -136,11 +145,11 @@ listanimate@list_ := Module[
 
 
 
-refresh[f_,dt_:1000] := $nbAddr <> Export["JWLSout/refresh.html", #, "Text"]& @ 
-	   TemplateApply[ Get@"/home/nicola/Gits/JWLS_2/JWLS_2_kernel/refresh.wl", 
+refresh[f_,dt_:1] := $nbAddr <> Export["JWLSout/refresh.html", #, "Text"]& @ 
+	   TemplateApply[ $kernelPath <> "refresh.wl" // Get, 
 		         <|(*"f" -> ExportString[f,"Text"],*)
 			   "f" -> BinarySerialize@f ~ExportString~ "Text",
-			   "dt" -> dt
+			   "dt" -> (1000 dt)
 			 |> ] 
 
 (* SetAttributes[refresh, {HoldAll, Protected}] *)
@@ -174,7 +183,7 @@ Off[General::stop]
 
 
 SocketListen[5858, listenerF]
-SocketListen[5859, webListenerF, HandlerFunctionsKeys -> {"DataByteArray","Data","SourceSocket"}]
+SocketListen[5859, webListenerF]
 
 Dialog[]
 '
