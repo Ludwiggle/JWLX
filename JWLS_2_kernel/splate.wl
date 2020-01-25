@@ -19,7 +19,8 @@ StringTemplate@"
 		}
 
 		request.open(\"POST\", url, true);
-		request.send(data+'//BinaryDeserialize//ReleaseHold');
+		request.send(data);
+		console.log(data + '// ReleaseHold');
 	}
 </script>
 

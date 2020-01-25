@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 mkdir JWLSout 2>/dev/null
 mkdir /dev/shm/JWLSout 2>/dev/null
 
@@ -18,7 +17,7 @@ $kernelPath = "/home/nicola/Gits/JWLS_2/JWLS_2_kernel/"
 
 $jupyterPath = RunProcess[{"which","jupyter"}, "StandardOutput"] // StringTrim
 
-$kernelPath2  = RunProcess[{"pip","show","jupyter"}] // 
+$kernelPath2 = RunProcess[{"pip","show","jupyter"}] // 
                If[#@"ExitCode" == 1
                   , Return@" > pip did not find jupyter"
                   , #@"StandardOutput" ~StringSplit~ "\n" // StringSplit] & // 
@@ -55,7 +54,6 @@ info@sym_Symbol := Column @ {
 Protect/@{show, $nbAddr, $nbAddrF, info}
 
 
-
 (***********************************************************************)
 webListenerF = Module[{request,result0,result,format,response},
     
@@ -81,8 +79,8 @@ webListenerF = Module[{request,result0,result,format,response},
 
 
 manipulate1 = $nbAddr <> Export["JWLSout/manipulate.html", #, "Text"]& @
-	            TemplateApply[ $kernelPath <> "splate.wl" // Get
-                            ,  <|"f" -> ExportString[#1 /. #2[[1]] -> ("\"+" <> ToString[#2[[1]]] <> "+\"") // BinarySerialize
+	      TemplateApply[ $kernelPath <> "splate.wl" // Get
+                            ,  <|"f" -> ExportString[#1 /. #2[[1]] -> ("+" <> ToString[#2[[1]]] <> "+") 
                                                      , "Text"],
                                 "v" -> #2[[1]],
                                 "x1" -> #2[[2]],
@@ -91,7 +89,7 @@ manipulate1 = $nbAddr <> Export["JWLSout/manipulate.html", #, "Text"]& @
                                |> ] &  
        
 
-(*SetAttributes[manipulate1, {HoldAll, Protected}]*)
+SetAttributes[manipulate1, Protected]
 
 
 manipulate2[f_, {v_, x1_, x2_, x3_:0.1}] := 
@@ -127,10 +125,10 @@ listanimate@list_ := Module[
 
 refresh[f_,dt_:1] := $nbAddr <> Export["JWLSout/refresh.html", #, "Text"]& @
                      TemplateApply[$kernelPath <> "refresh.wl" // Get
-                                   , <| "f" -> BinarySerialize@f ~ExportString~ "Text",
+                                   , <| "f" -> f ~ExportString~ "Text",
                                         "dt" -> (1000 dt) |>] 
 
-(* SetAttributes[refresh, {HoldAll, Protected}] *)
+SetAttributes[refresh, Protected]
 
 
 (***********************************************************************)
@@ -153,7 +151,11 @@ SetAttributes[listenerF, Protected]
                
 (***********************************************************************)
 SocketListen[5858, listenerF]
-SocketListen[5859, webListenerF]
+
+webSocketF := ($webSocket = SocketListen[5859, webListenerF])
+webSocketF
+restartWebSocket := ( Close /@ Select[Sockets[] , #[[1]] == $webSocket[[1]]&];
+		     webSocketF )
 
 Dialog[]
 '

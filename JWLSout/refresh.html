@@ -1,4 +1,4 @@
-StringTemplate@"
+
 <html>
 <body>
 
@@ -6,13 +6,13 @@ StringTemplate@"
     
 <script>
     
-    setInterval( refresher, '`dt`' );
+    setInterval( refresher, '200.0' );
     
     function refresher() {
     
         const request = new XMLHttpRequest();
         const url = 'http://127.0.0.1:5859';
-        data = '`f`';
+        data = 'HoldForm[RandomGraph[{100, 100}]]';
         
         request.onload = function() {
             document.getElementById('result').innerHTML = request.responseText;
@@ -27,4 +27,3 @@ StringTemplate@"
 
 </body>
 </html>
-"
