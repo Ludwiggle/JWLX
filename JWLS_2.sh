@@ -26,7 +26,7 @@ $kernelPath2 = RunProcess[{"pip","show","jupyter"}] //
 
 
 nbAddrF := ReadString["!" <> $jupyterPath <> "-notebook list"] ~
-	   StringCases ~ Shortest["http://"~~__~~"/"] //
+           StringCases ~ Shortest["http://"~~__~~"/"] //
 	   If[# == {}
 	      , Run[$jupyterPath <>"-notebook &"]; Pause@1; nbAddrF
 	      , First@# <> "files/" 
@@ -81,15 +81,16 @@ webListenerF = Module[{request,result0,result,format,response},
 manipulate1 = $nbAddr <> Export["JWLSout/manipulate.html", #, "Text"]& @
 	      TemplateApply[ $kernelPath <> "splate.wl" // Get
                             ,  <|"f" -> ExportString[#1 /. #2[[1]] -> ("+" <> ToString[#2[[1]]] <> "+") 
-                                                     , "Text"],
-                                "v" -> #2[[1]],
-                                "x1" -> #2[[2]],
-                                "x2" -> #2[[3]],
-                                "x3" -> If[Length@#2 == 4, #2[[4]], .1 (#2[[3]]-#2[[2]]) ]
+						      , "Text"],
+                                 "v" -> #2[[1]],
+                                 "x1" -> #2[[2]],
+                                 "x2" -> #2[[3]],
+                                 "x3" -> If[Length@#2 == 4, #2[[4]], .1 (#2[[3]]-#2[[2]]) ]
                                |> ] &  
        
 
 SetAttributes[manipulate1, Protected]
+
 
 
 manipulate2[f_, {v_, x1_, x2_, x3_:0.1}] := 
