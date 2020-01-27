@@ -5,8 +5,7 @@ Minimalistic Wolfram Language Kernel for Jupyter Notebooks
 
 * Autocompletion of WL Symbols
 * WL syntax highlighting
-* Vector graphics outputs displayed by the Jupyter file viewer
-* Dynamic emulated in JS 
+* Graphics and *dynamic* displayed in the browser
 
 ### Installation
 
@@ -26,7 +25,7 @@ For AWS instances also add the pem. For Google Cloud follow their instructions a
 
 
 
-#### Graphics and Dynamic
+#### Graphics and *Dynamic*
 
 There are 3 custom functions to deal with graphics and dynamical outputs:
 
