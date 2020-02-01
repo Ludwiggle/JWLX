@@ -39,7 +39,7 @@ At every change of the slider value, the JS script sends a POST request to the W
 
 3. `refresh` works similarly to `manipulate` but, without a slider, the JS script sends POST requests at regular intervals.  Valid syntax is `refresh[expr]` with a default update interval of 1s, or `refresh[expr, dt]` with an update interval of `dt` seconds.
 
-4. `listanimate` mimics ListAnimate and it is very efficient. Valid syntax is `listanimate[{e_1, e_2, .., e_N}]`. Contrary to the previous functions, `listanimate` does not rely on the Wolfram Engine as a back-end. Instead, it exports all the N expressions as PNGs into the ramdisk and eventually it creates an HTML with a slider that select the image to display. 
+4. `listanimate` mimics ListAnimate and it is very efficient. Valid syntax is `listanimate[{e_1, e_2, .., e_N}]`. Contrary to the previous functions, `listanimate` does not rely on the Wolfram Engine as a back-end. Instead, it exports all the N expressions as PNGs into the ramdisk and eventually it creates a page with a slider that selects the image to display. 
 
 
 
