@@ -11,7 +11,7 @@ Minimalistic Wolfram Language Kernel for Jupyter Notebooks
 
 1. Copy `JWLS_kernel` folder where jupyter expects custom kernels to be, typically in `~/miniconda3/lib/python3.7/site-packages/` 
 2. Run the installation script  `python JWLS_2_kernel/install.py` 
-3. Check if `JWLS.sh` points the actual `wolframscript` executable, then make it globally available: `sudo cp JWLS_2.sh /usr/local/bin/JWLS
+3. Check if `JWLS.sh` points the actual `wolframscript` executable, then make it globally available: `sudo cp JWLS_2.sh /usr/local/bin/JWLS`
 
 ### Usage 
 
