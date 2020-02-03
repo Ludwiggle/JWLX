@@ -137,7 +137,7 @@ parseCellF = (
   ToExpression[#, InputForm, Hold] ~DeleteCases~ Null // 
   List @@ HoldForm /@ # & //
   Check[ ReleaseHold @ #,  Last @ $MessageList ]& /@ # & //
-  # ~DeleteCases~ Null /. x_?NumericQ -> ScriptForm@x & //
+  # ~DeleteCases~ Null /. _x?NumericQ -> ScriptForm@x & //
   Column @ Riffle[#, " "]& 
 )&
 
