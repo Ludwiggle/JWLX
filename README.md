@@ -34,16 +34,14 @@ For AWS instances also add the pem. For Google Cloud follow their instructions a
 
 There are 3 custom functions to deal with graphics and dynamical outputs:
 
-1. `show` returns a a clickable URL of the pdf export of any expression, except for images that are exported to PNG. In this way, graphics is rendered by the browser PDF reader or, in case of images, by the Jupyter file viewer.
+1. `show` returns a URL of the pdf export of any expression, except for images that are exported to PNG. By clicking the URL, graphics graphics gets rendered by the browser PDF reader or, in case of images, by the Jupyter file viewer.
 
-2. `manipulate` mimics Manipuate and it returns an HTML+JS page with a single slider; multiple sliders or different types of controllers are not supported yet. Valid syntax is `manipulate[Hold @ expr, {u, u_min, u_max}]` with a default slider step of 1 tenth of the interval `u_max - u_min`, or with a specified step `manipulate[Hold @ exp, {u, u_min, u_max, du}]`. **Note:** To wrap `expr` in `Hold` is necessary in most cases.  
+2. `manipulate` mimics Manipuate and it returns a dynamic HTML page with a single slider; multiple sliders or different types of controllers are not supported yet. Valid expressions are  `manipulate[Hold @ expr, {u, u_min, u_max, du}]` or  `manipulate[Hold @ exp, {u, u_min, u_max}]` with a default value of `du`=1/10 or the interval. **Note:** To wrap `expr` in `Hold` is necessary in most cases.  
 At every change of the slider value, the JS script sends a POST request to the Wolfram Engine that provides an `HTTPResponse`.  
 
-3. `refresh` works similarly to `manipulate` but, without a slider, the JS script sends POST requests at regular intervals.  Valid syntax is `refresh[expr]` with a default update interval of 1s, or `refresh[expr, dt]` with an update interval of `dt` seconds.
+3. `refresh` works similarly to `manipulate` there is no slider; the JS script automatically sends POST requests at regular intervals.  Valid syntax is `refresh[expr, dt]`  or `refresh[expr]`  with a default update interval `dt`= 1s.
 
-4. `listanimate` mimics ListAnimate and it is very efficient. Valid syntax is `listanimate[{e_1, e_2, .., e_N}]`. Contrary to the previous functions, `listanimate` does not rely on the Wolfram Engine as a back-end. Instead, it exports all the N expressions as PNGs into the ramdisk and eventually it creates a page with a slider that selects the image to display. 
-
-
+4. `listanimate` mimics ListAnimate and it gives the smoothest experience insofar all outputs are preemptively saved in RAM. Valid syntax is `listanimate[{e_1, e_2, .., e_N}]`.
 
 
 
