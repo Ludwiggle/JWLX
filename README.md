@@ -7,7 +7,7 @@ Jupyter notebooks for Wolfram Language on Linux.
 
 * Autocompletion of WL Symbols
 * WL syntax highlighting
-* Graphics and *dynamic* displayed in the browser
+* Graphics and interactive objects handled by the browser
 
 ### Installation
 
@@ -30,7 +30,7 @@ For AWS instances also add the pem. For Google Cloud follow their instructions a
 
 
 
-#### Graphics and *Dynamic*
+#### Graphics and Interactivity
 
 There are 3 custom functions to deal with graphics and dynamical outputs:
 
