@@ -1,4 +1,4 @@
-# JWLS_2
+# JWLX
 
 Jupyter notebooks for Wolfram Language on Linux. 
 
