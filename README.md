@@ -1,5 +1,7 @@
 # JWLS_2
-Minimalistic Wolfram Language Kernel for Jupyter Notebooks
+
+Jupyter notebooks for Wolfram Language on Linux. 
+
 
 ### Features
 
