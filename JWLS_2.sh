@@ -13,7 +13,7 @@ function finish {
 wolframscript -c '
 
 
-$kernelPath = "/home/nicola/Gits/JWLS_2/JWLS_2_kernel/"
+$kernelPath = "/home/nicola/miniconda3/lib/python3.7/site-packages/JWLS_2_kernel/"
 
 $jupyterPath = RunProcess[{"which","jupyter"}, "StandardOutput"] // StringTrim
 
@@ -138,7 +138,8 @@ parseCellF = (
   List @@ HoldForm /@ # & //
   Check[ ReleaseHold @ #,  Last @ $MessageList ]& /@ # & //
   # ~DeleteCases~ Null /. _x?NumericQ -> ScriptForm@x & //
-  Column @ Riffle[#, " "]& 
+  Column @ Riffle[#, " "]& // 
+  ToString[#, CharacterEncoding->"UTF-8"]&
 )&
 
 SetAttributes[parseCellF, Protected]
