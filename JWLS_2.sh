@@ -17,12 +17,13 @@ $kernelPath = "/home/nicola/miniconda3/lib/python3.7/site-packages/JWLS_2_kernel
 
 $jupyterPath = RunProcess[{"which","jupyter"}, "StandardOutput"] // StringTrim
 
-$kernelPath2 = RunProcess[{"pip","show","jupyter"}] // 
+(*$kernelPath2 = RunProcess[{"pip","show","jupyter"}] // 
                If[#@"ExitCode" == 1
                   , Return@" > pip did not find jupyter"
                   , #@"StandardOutput" ~StringSplit~ "\n" // StringSplit] & // 
                Select[#, First@# == "Location:" &][[1,2]]<>"/JWLS_2_kernel/" &  //
                If[DirectoryQ@#, #, Return@" > JWLS kernel folder not found"]&
+*)
 
 
 nbAddrF := ReadString["!" <> $jupyterPath <> "-notebook list"] ~
@@ -34,7 +35,7 @@ nbAddrF := ReadString["!" <> $jupyterPath <> "-notebook list"] ~
 
 $nbAddr = nbAddrF
 
-$Output = {}
+(*$Output = {}*)
 
 Off[General::stop] 
 
