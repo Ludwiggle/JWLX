@@ -12,8 +12,7 @@ function finish {
 
 wolframscript -c '
 
-
-$kernelPath = "/home/nicola/miniconda3/lib/python3.7/site-packages/JWLS_2_kernel/"
+$kernelPath = "/home/nicola/Gits/JWLS_2/JWLS_2_kernel/"
 
 $jupyterPath = RunProcess[{"which","jupyter"}, "StandardOutput"] // StringTrim
 
@@ -25,7 +24,6 @@ $jupyterPath = RunProcess[{"which","jupyter"}, "StandardOutput"] // StringTrim
                If[DirectoryQ@#, #, Return@" > JWLS kernel folder not found"]&
 *)
 
-
 nbAddrF := ReadString["!" <> $jupyterPath <> "-notebook list"] ~
            StringCases ~ Shortest["http://"~~__~~"/"] //
 	   If[# == {}
@@ -33,7 +31,7 @@ nbAddrF := ReadString["!" <> $jupyterPath <> "-notebook list"] ~
 	      , First@# <> "files/" 
 	     ]&
 
-$nbAddr = nbAddrF
+$nbAddr =  nbAddrF // Echo
 
 (*$Output = {}*)
 
@@ -51,8 +49,13 @@ info@sym_Symbol := Column @ {
    Information[sym,"Usage"],
    "https://reference.wolfram.com/language/ref/"<>ToString@sym<>".html"}
 
+IncrementalFilenames[data_List, ext_String] := 
+  "JWLSout/"<>StringPadLeft[ToString@#, 1+Floor@Log[10,Length@data],"0"]<>"."<>ext & /@ Range@Length@data
+  
+ExportList[data_List, ext_String] := Export[#1,#2]&~MapThread~{IncrementalFilenames[data, ext],data} 
 
-Protect/@{show, $nbAddr, $nbAddrF, info}
+
+Protect/@{show, $nbAddr, $nbAddrF, info, IncrementalFilenames, ExportList}
 
 
 (***********************************************************************)
@@ -137,12 +140,14 @@ SetAttributes[refresh, Protected]
 parseCellF = (
   ToExpression[#, InputForm, Hold] ~DeleteCases~ Null // 
   List @@ HoldForm /@ # & //
-  Check[ ReleaseHold @ #,  Last @ $MessageList ]& /@ # & //
+  Check[ ReleaseHold @ # // Shallow,  Last @ $MessageList ]& /@ # & //
   # ~DeleteCases~ Null /. _x?NumericQ -> ScriptForm@x & //
-  Column @ Riffle[#, " "]& // 
-  ToString[#, CharacterEncoding->"UTF-8"]&
+  Column @ Riffle[#, " "]& // ToString[#, CharacterEncoding->"UTF-8"]& //
+  If[StringLength@#>10000, StringTake[#,10000]<>"\n..."<>ToString@StringLength@#<>">>", #]& //
+  If[#=="Null", "", #]&
 )&
 
+(*{"à"->"a", "ò"->"o", "ù"->"u", "ì"->"i", "è"->"e"}*)
 SetAttributes[parseCellF, Protected]
 
 

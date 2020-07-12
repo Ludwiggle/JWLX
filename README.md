@@ -41,3 +41,5 @@ At every change of the slider value, the JS script sends a POST request to the W
 In order to use it on a cloud compute virtual machine, edit the `JWLS` script at the `nbAddrF` function definition by adding `jupyter notebook --no-browser --port=7000` . Then `screen` a session, run `JWLS` and detach it (Ctrl A + Ctrl D). Go back to your local machine and   `ssh -N -f -L  localhost:6001:localhost:7000  <IP>"`.
 For AWS instances also add the pem. For Google Cloud follow their instructions about remote jupyter notebooks. 
 
+#### Additional Functions
+* ExportList
