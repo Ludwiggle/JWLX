@@ -57,6 +57,12 @@ ExportList[data_List, ext_String] := Export[#1,#2]&~MapThread~{IncrementalFilena
 
 Protect/@{show, $nbAddr, $nbAddrF, info, IncrementalFilenames, ExportList}
 
+(*
+Persistent Repository Functions
+
+ResourceFunction["PersistResourceFunction"]/@ {"SVGImport", "ImportCSVToDataset", "ReadPNG", "ImportOnce","MapCases"} 
+*)
+
 
 (***********************************************************************)
 webListenerF = Module[{request,result0,result,format,response},
@@ -140,7 +146,7 @@ SetAttributes[refresh, Protected]
 parseCellF = (
   ToExpression[#, InputForm, Hold] ~DeleteCases~ Null // 
   List @@ HoldForm /@ # & //
-  Check[ ReleaseHold @ # // Shallow,  Last @ $MessageList ]& /@ # & //
+  Check[ ReleaseHold @ # // Shallow[#,{Infinity, 50}]&,  Last @ $MessageList ]& /@ # & //
   # ~DeleteCases~ Null /. _x?NumericQ -> ScriptForm@x & //
   Column @ Riffle[#, " "]& // ToString[#, CharacterEncoding->"UTF-8"]& //
   If[StringLength@#>10000, StringTake[#,10000]<>"\n..."<>ToString@StringLength@#<>">>", #]& //
