@@ -9,8 +9,8 @@ def wl_response(wl_cell):
         return os.popen('cat /dev/shm/jwlsin | nc 127.0.0.1 5858').read()
 
 
-WNames = wl_response('StringRiffle@Names@"System`*"').split()
-              
+#WNames = wl_response('StringRiffle@Names@"System`*"').split()
+WNames = open('/opt/conda/lib/python3.7/site-packages/JWLS_2_kernel/Names.wl.txt','r').read().split()
 
 ######################################################################################
 class JWLS_2_kernel(Kernel):
