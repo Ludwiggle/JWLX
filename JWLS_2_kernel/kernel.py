@@ -9,8 +9,6 @@ def wl_response(wl_cell):
         return os.popen('cat /dev/shm/jwlsin | nc 127.0.0.1 5858').read()
 
 
-#WNames = wl_response('StringRiffle@Names@"System`*"').split()
-WNames = open('/opt/conda/lib/python3.7/site-packages/JWLS_2_kernel/Names.wl.txt','r').read().split()
 
 ######################################################################################
 class JWLS_2_kernel(Kernel):
@@ -63,10 +61,8 @@ class JWLS_2_kernel(Kernel):
                             
         start = cursor_pos - len(token)
         
-        allWNames = wl_response('StringRiffle@Names@"Global`*"').split() + WNames
+        matches = wl_response('StringRiffle@Names@"{}*"'.format(token)).split()
 
-        matches = [m for m in allWNames if m.startswith(token)]
-
-        return {'matches': sorted(matches), 'cursor_start': start,
+        return {'matches': matches, 'cursor_start': start,
                 'cursor_end': cursor_pos,
                 'status': 'ok'}
