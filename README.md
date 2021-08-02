@@ -5,13 +5,13 @@ Jupyter notebooks for Wolfram Language on Linux.
 
 ### Installation
 
-1. Copy `JWLS_kernel` folder where jupyter expects custom kernels to be, typically in `~/miniconda3/lib/python3.7/site-packages/` 
-2. Run the installation script  `python JWLS_2_kernel/install.py` 
-3. Check if `JWLS.sh` points the actual `wolframscript` executable, then make it globally available: `sudo cp JWLS_2.sh /usr/local/bin/JWLS`
+1. Copy `JWLX_kernel` folder where jupyter expects custom kernels to be, typically in `~/miniconda3/lib/python3.7/site-packages/` 
+2. Run the installation script  `python JWLX_kernel/install.py` 
+3. Check if `JWLS.sh` points the actual `wolframscript` executable, then make it globally available: `sudo cp JWLX.sh /usr/local/bin/JWLX`
 
 ### Usage 
 
-Run `JWLS`. 
+Run `JWLX`. 
 
 ### Features
 
@@ -38,7 +38,7 @@ At every change of the slider value, the JS script sends a POST request to the W
 
 #### Remote Notebooks
 
-In order to use it on a cloud compute virtual machine, edit the `JWLS` script at the `nbAddrF` function definition by adding `jupyter notebook --no-browser --port=7000` . Then `screen` a session, run `JWLS` and detach it (Ctrl A + Ctrl D). Go back to your local machine and   `ssh -N -f -L  localhost:6001:localhost:7000  <IP>"`.
+In order to use it on a cloud compute virtual machine, edit the `JWLX` script at the `nbAddrF` function definition by adding `jupyter notebook --no-browser --port=7000` . Then `screen` a session, run `JWLX` and detach it (Ctrl A + Ctrl D). Go back to your local machine and   `ssh -N -f -L  localhost:6001:localhost:7000  <IP>"`.
 For AWS instances also add the pem. For Google Cloud follow their instructions about remote jupyter notebooks. 
 
 #### Additional Functions
